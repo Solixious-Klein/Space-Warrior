@@ -153,9 +153,13 @@ public class SpaceWarriorPanel extends JPanel {
 	}
 	private void drawStars(Graphics2D g2d) {
 		synchronized(stars) {
-			Iterator<Star> itrStar = stars.iterator();
+			/*Iterator<Star> itrStar = stars.iterator();
 			while(itrStar.hasNext()) {
 				Star s = itrStar.next();
+				g2d.drawImage(s.getImage(), s.getX(), s.getY(), this);
+			}*/
+			for(int i = 0; i < stars.size(); i++) {
+				Star s = stars.get(i);
 				g2d.drawImage(s.getImage(), s.getX(), s.getY(), this);
 			}
 		}
@@ -174,54 +178,79 @@ public class SpaceWarriorPanel extends JPanel {
 	}
 	private void drawMissiles(Graphics2D g2d) {
 		synchronized(missiles) {
-			Iterator<Missile> itrMissile = missiles.iterator();
+			/*Iterator<Missile> itrMissile = missiles.iterator();
 			while(itrMissile.hasNext()) {
 				Missile m = itrMissile.next();
+				g2d.drawImage(m.getImage(), m.getX(), m.getY(), this);
+			}*/
+			for(int i = 0; i < missiles.size(); i++) {
+				Missile m = missiles.get(i);
 				g2d.drawImage(m.getImage(), m.getX(), m.getY(), this);
 			}
 		}
 	}
 	private void drawVillainMissiles1(Graphics2D g2d) {
 		synchronized(missiles) {
-			Iterator<VillainMissile1> itrVillainMissile1 = villainMissiles1.iterator();
+			/*Iterator<VillainMissile1> itrVillainMissile1 = villainMissiles1.iterator();
 			while(itrVillainMissile1.hasNext()) {
 				VillainMissile1 vm = itrVillainMissile1.next();
+				g2d.drawImage(vm.getImage(), vm.getX(), vm.getY(), this);
+			}*/
+			for(int i = 0; i < villainMissiles1.size(); i++) {
+				VillainMissile1 vm = villainMissiles1.get(i);
 				g2d.drawImage(vm.getImage(), vm.getX(), vm.getY(), this);
 			}
 		}
 	}
 	private void drawAsteroids(Graphics2D g2d) {
 		synchronized(asteroids) {
-			Iterator<Asteroid> itrAsteroid = asteroids.iterator();
+			/*Iterator<Asteroid> itrAsteroid = asteroids.iterator();
 			while(itrAsteroid.hasNext()) {
 				Asteroid a = itrAsteroid.next();
+				g2d.drawImage(a.getImage(), a.getX(), a.getY(), this);
+			}*/
+			for(int i = 0; i < asteroids.size(); i++) {
+				Asteroid a = asteroids.get(i);
 				g2d.drawImage(a.getImage(), a.getX(), a.getY(), this);
 			}
 		}
 	}
 	private void drawHealthPacks(Graphics2D g2d) {
 		synchronized(healthPacks) {
-			Iterator<HealthPack> itrHealthPack = healthPacks.iterator();
+			/*Iterator<HealthPack> itrHealthPack = healthPacks.iterator();
 			while(itrHealthPack.hasNext()) {
 				HealthPack hp = itrHealthPack.next();
+				g2d.drawImage(hp.getImage(), hp.getX(), hp.getY(), this);
+			}*/
+			for(int i = 0; i < healthPacks.size(); i++) {
+				HealthPack hp = healthPacks.get(i);
 				g2d.drawImage(hp.getImage(), hp.getX(), hp.getY(), this);
 			}
 		}
 	}
 	private void drawVillains(Graphics2D g2d) {
 		synchronized(villains) {
-			Iterator<Villain> itrVillain = villains.iterator();
+			/*Iterator<Villain> itrVillain = villains.iterator();
 			while(itrVillain.hasNext()) {
 				Villain v = itrVillain.next();
+				g2d.drawImage(v.getImage(), v.getX(), v.getY(), this);
+			}*/
+			for(int i = 0; i < villains.size(); i++) {
+				Villain v = villains.get(i);
 				g2d.drawImage(v.getImage(), v.getX(), v.getY(), this);
 			}
 		}
 	}
 	private void drawShields(Graphics2D g2d) {
 		synchronized(shields) {
-			Iterator<Shield> itrShields = shields.iterator();
+			/*Iterator<Shield> itrShields = shields.iterator();
 			while(itrShields.hasNext()) {
 				Shield s = itrShields.next();
+				g2d.drawImage(s.getImage(), s.getX(), s.getY(), this);
+				
+			}*/
+			for(int i = 0; i < shields.size(); i++) {
+				Shield s = shields.get(i);
 				g2d.drawImage(s.getImage(), s.getX(), s.getY(), this);
 			}
 		}
@@ -310,18 +339,16 @@ public class SpaceWarriorPanel extends JPanel {
 			}
 		}
 		private void updateMissiles() {
-			Iterator<Missile> itrMissile = missiles.iterator();
 			ArrayList<Missile> deadMissile = new ArrayList<Missile>();
-			while(itrMissile.hasNext()) {
-				Missile m = itrMissile.next();
+			for(int i = 0; i < missiles.size(); i++) {
+				Missile m = missiles.get(i);
 				m.move();
 				if(!m.isOnScreen())
 					deadMissile.add(m);
 				
-				Iterator<Asteroid> itrAsteroid = asteroids.iterator();
 				ArrayList<Asteroid> deadAsteroid = new ArrayList<Asteroid>();
-				while(itrAsteroid.hasNext()) {
-					Asteroid a = itrAsteroid.next();
+				for(int j = 0; j < asteroids.size(); j++) {
+					Asteroid a = asteroids.get(j);
 					if(CollisionDetector.isColliding(m, a)) {
 						a.damaged(m.getStrength());
 						deadMissile.add(m);
@@ -331,52 +358,44 @@ public class SpaceWarriorPanel extends JPanel {
 						score += (m.getStrength() * a.getType() * 10);
 					}
 				}
-				itrAsteroid = deadAsteroid.iterator();
-				while(itrAsteroid.hasNext()) {
-					Asteroid a = itrAsteroid.next();
+				for(int j = 0; j < deadAsteroid.size(); j++) {
+					Asteroid a = deadAsteroid.get(j);
 					asteroids.remove(a);
 				}
 				
-				Iterator<Villain> itrVillain = villains.iterator();
 				ArrayList<Villain> deadVillain = new ArrayList<Villain>();
-				while(itrVillain.hasNext()) {
-					Villain v = itrVillain.next();
+				for(int j = 0; j < villains.size(); j++) {
+					Villain v = villains.get(j);
 					if(CollisionDetector.isColliding(m, v)) {
 						v.damaged(m.getStrength());
 						deadMissile.add(m);
-						deadVillain.add(v);
 					}
 					if(!v.isOnScreen()) {
 						deadVillain.add(v);
 						score += 100;
 					}
 				}
-				itrAsteroid = deadAsteroid.iterator();
-				while(itrAsteroid.hasNext()) {
-					Asteroid a = itrAsteroid.next();
-					asteroids.remove(a);
+				for(int j = 0; j < deadVillain.size(); j++) {
+					Villain v = deadVillain.get(j);
+					villains.remove(v);
 				}
-				
-			}
+			}   
 			
-			itrMissile = deadMissile.iterator();
-			while(itrMissile.hasNext()) {
-				Missile m = itrMissile.next();
+			for(int i = 0; i < deadMissile.size(); i++) {
+				Missile m = deadMissile.get(i);
 				missiles.remove(m);
 			}
 		}
 		private void updateStars() {
-			Iterator<Star> itrStar = stars.iterator();
 			ArrayList<Star> deadStar = new ArrayList<Star>();
-			while(itrStar.hasNext()) {
-				Star s = itrStar.next();
+			for(int i = 0; i < stars.size(); i++) {
+				Star s = stars.get(i);
 				s.move();
 				if(!s.isOnScreen())
 					deadStar.add(s);
 			}
-			itrStar = deadStar.iterator();
-			while(itrStar.hasNext()) {
-				Star s = itrStar.next();
+			for(int i = 0; i < deadStar.size(); i++) {
+				Star s = deadStar.get(i);
 				stars.remove(s);
 			}
 			
@@ -385,10 +404,9 @@ public class SpaceWarriorPanel extends JPanel {
 				stars.add(new Star());
 		}
 		private void updateHealthPacks() {
-			Iterator<HealthPack> itrHealthPack = healthPacks.iterator();
 			ArrayList<HealthPack> deadHealthPack = new ArrayList<HealthPack>();
-			while(itrHealthPack.hasNext()) {
-				HealthPack hp = itrHealthPack.next();
+			for(int i = 0; i < healthPacks.size(); i++) {
+				HealthPack hp = healthPacks.get(i);
 				hp.move();
 				if(CollisionDetector.isColliding(sc, hp)) {
 					sc.damaged(-2);
@@ -397,9 +415,9 @@ public class SpaceWarriorPanel extends JPanel {
 				if(!hp.isOnScreen())
 					deadHealthPack.add(hp);
 			}
-			itrHealthPack = deadHealthPack.iterator();
-			while(itrHealthPack.hasNext()) {
-				HealthPack hp = itrHealthPack.next();
+			
+			for(int i = 0; i < deadHealthPack.size(); i++) {
+				HealthPack hp = deadHealthPack.get(i);
 				healthPacks.remove(hp);
 			}
 			
@@ -411,10 +429,9 @@ public class SpaceWarriorPanel extends JPanel {
 			sc.move();
 		}
 		private void updateShields() {
-			Iterator<Shield> itrShields = shields.iterator();
 			ArrayList<Shield> deadShields = new ArrayList<Shield>();
-			while(itrShields.hasNext()) {
-				Shield s = itrShields.next();
+			for(int i = 0; i < shields.size(); i++) {
+				Shield s = shields.get(i);
 				s.move();
 				if(CollisionDetector.isColliding(s, sc)) {
 					sc.activateShield();
@@ -423,9 +440,8 @@ public class SpaceWarriorPanel extends JPanel {
 				if(!s.isOnScreen())
 					deadShields.add(s);
 			}
-			itrShields = deadShields.iterator();
-			while(itrShields.hasNext()) {
-				Shield s = itrShields.next();
+			for(int i = 0; i < deadShields.size(); i++) {
+				Shield s = deadShields.get(i);
 				shields.remove(s);
 			}
 			
@@ -435,10 +451,9 @@ public class SpaceWarriorPanel extends JPanel {
 			}
 		}
 		private void updateAsteroids() {
-			Iterator<Asteroid> itrAsteroid = asteroids.iterator();
 			ArrayList<Asteroid> deadAsteroid = new ArrayList<Asteroid>();
-			while(itrAsteroid.hasNext()) {
-				Asteroid a = itrAsteroid.next();
+			for(int i = 0; i < asteroids.size(); i++) {
+				Asteroid a = asteroids.get(i);
 				a.move();
 				if(CollisionDetector.isColliding(sc, a)) {
 					if(!sc.isShieldActive())
@@ -448,9 +463,9 @@ public class SpaceWarriorPanel extends JPanel {
 				if(!a.isOnScreen())
 					deadAsteroid.add(a);
 			}
-			itrAsteroid = deadAsteroid.iterator();
-			while(itrAsteroid.hasNext()) {
-				Asteroid a = itrAsteroid.next();
+			
+			for(int i = 0; i < deadAsteroid.size(); i++) {
+				Asteroid a = deadAsteroid.get(i);
 				asteroids.remove(a);
 			}
 			
@@ -459,10 +474,10 @@ public class SpaceWarriorPanel extends JPanel {
 				asteroids.add(new Asteroid());
 		}
 		private void updateVillains() {
-			Iterator<Villain> itrVillain = villains.iterator();
+			
 			ArrayList<Villain> deadVillain = new ArrayList<Villain>();
-			while(itrVillain.hasNext()) {
-				Villain v = itrVillain.next();
+			for(int i = 0; i < villains.size(); i++) {
+				Villain v = villains.get(i);
 				v.move();
 				if(CollisionDetector.isColliding(v, sc)) {
 					if(!sc.isShieldActive())
@@ -473,9 +488,9 @@ public class SpaceWarriorPanel extends JPanel {
 					deadVillain.add(v);
 				}
 			}
-			itrVillain = deadVillain.iterator();
-			while(itrVillain.hasNext()) {
-				Villain v = itrVillain.next();
+			
+			for(int i = 0; i < deadVillain.size(); i++) {
+				Villain v = deadVillain.get(i);
 				villains.remove(v);
 			}
 			villainItr = (villainItr + 1) % (VILLAIN_RATE_LIMITER - RATE_OF_VILLAINS);
@@ -483,10 +498,9 @@ public class SpaceWarriorPanel extends JPanel {
 				villains.add(new Villain(thisPanel));
 		}
 		private void updateVillainMissiles1() {
-			Iterator<VillainMissile1> itrVillainMissiles1 = villainMissiles1.iterator();
 			ArrayList<VillainMissile1> deadVillainMissiles = new ArrayList<VillainMissile1>();
-			while(itrVillainMissiles1.hasNext()) {
-				VillainMissile1 v = itrVillainMissiles1.next();
+			for(int i = 0; i < villainMissiles1.size(); i++) {
+				VillainMissile1 v = villainMissiles1.get(i);
 				v.move();
 				if(CollisionDetector.isColliding(v, sc)) {
 					if(!sc.isShieldActive())
@@ -497,9 +511,9 @@ public class SpaceWarriorPanel extends JPanel {
 					deadVillainMissiles.add(v);
 				}
 			}
-			itrVillainMissiles1 = deadVillainMissiles.iterator();
-			while(itrVillainMissiles1.hasNext()) {
-				VillainMissile1 v = itrVillainMissiles1.next();
+			//itrVillainMissiles1 = deadVillainMissiles.iterator();
+			for(int i = 0; i < deadVillainMissiles.size(); i++) {
+				VillainMissile1 v = deadVillainMissiles.get(i);
 				villainMissiles1.remove(v);
 			}
 		}

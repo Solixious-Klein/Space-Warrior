@@ -17,13 +17,13 @@ public class Villain implements SpaceObject{
 		int type = (int)(Math.random()*2) + 1;
 		if(type == 1) {
 			image = SpriteSheets.image1.getSubimage(92, 188, 27, 22);
-			height = 27;
-			width = 22;
+			width = 27;
+			height = 22;
 		}
 		else if(type == 2){
 			image = SpriteSheets.image1.getSubimage(92, 161, 27, 22);
-			height = 27;
-			width = 22;
+			width = 27;
+			height = 22;
 		}
 		speed = 1;
 		x = (int)(Math.random()*512);
