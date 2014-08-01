@@ -2,14 +2,18 @@ import java.awt.image.BufferedImage;
 
 
 public class Villain implements SpaceObject{
+	private SpaceWarriorPanel swp;
+	
 	private int speed;
 	private int x, y, width, height, health;
+	private int itr;
 	
 	private BufferedImage image;
 	
 	private boolean isOnScreen;
 	
-	public Villain() {
+	public Villain(SpaceWarriorPanel swp) {
+		this.swp = swp;
 		int type = (int)(Math.random()*2) + 1;
 		if(type == 1) {
 			image = SpriteSheets.image1.getSubimage(92, 188, 27, 22);
@@ -47,6 +51,10 @@ public class Villain implements SpaceObject{
 	@Override
 	public void move() {
 		y += speed;
+		itr = (itr + 1) % 100;
+		if(itr == 99) {
+			fire();
+		}
 		if(y > 512 + height) {
 			isOnScreen = false;
 		}
@@ -67,5 +75,9 @@ public class Villain implements SpaceObject{
 		if(health <= 0) {
 			isOnScreen = false;
 		}
+	}
+	public void fire() {
+		VillainMissile1 v = new VillainMissile1(x + (int)(0.5 * width), y + (int)(0.5 * height));
+		swp.addVillainMissile1(v);
 	}
 }
