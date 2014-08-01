@@ -14,6 +14,8 @@ import javax.swing.JPanel;
 
 public class SpaceWarriorPanel extends JPanel { 
 	private static final long serialVersionUID = 1L;
+
+	private SpaceWarriorPanel thisPanel;
 	
 	private static final int FPS = 100;	//Frames per second
 	private static final int WAIT_TIME_CONSTANT = 1000/FPS;	//time in ms the code will wait before repainting the screen
@@ -23,34 +25,40 @@ public class SpaceWarriorPanel extends JPanel {
 	private static final int ASTEROIDS_RATE_LIMITER = 100;
 	private static final int STARS_RATE_LIMITER = 100;
 	private static final int HEALTHPACKS_RATE_LIMITER = 1000;
-	private static final int VILLAIN_RATE_LIMITER = 100;
+	private static final int VILLAIN_RATE_LIMITER = 400;
+	private static final int SHIELDS_RATE_LIMITER = 1000;
 	
 	private static int RATE_OF_ASTEROIDS = 50; //rate of asteroids fall
 	private static int RATE_OF_STARS = 50;	//rate of stars appearing
 	private static int RATE_OF_HEALTHPACKS = 0;	//rate of appearance of health packs
 	private static int RATE_OF_VILLAINS = 50;	//rate of appearance of villains
+	private static int RATE_OF_SHIELDS = 10;	//rate of appearance of villains
+	
 	
 	private ArrayList<Missile> missiles;	//list of player's missiles on screen
 	private ArrayList<Star> stars;	//list of starts currently visible
 	private ArrayList<Asteroid> asteroids;	//list of asteroids on screen
 	private ArrayList<HealthPack> healthPacks;	//list of health packs on screen
 	private ArrayList<Villain> villains;	//list of villains on screen 
+	private ArrayList<VillainMissile1> villainMissiles1;
+	private ArrayList<Shield> shields;
 	
 	
-	private SpaceCraft sc;	//the space craft's object
+	protected static SpaceCraft sc;	//the space craft's object
 	private Thread at;	//animation thread
 	private Thread ut; //updation thred
 	
 	private boolean isAnimating;	//animation stops if this is false
 	
-	private int starItr, asteroidItr, healthPackItr, villainItr;	//iterators for appearance of various occasional objects like stars, asteroids and healthpacks on screen
+	private int starItr, asteroidItr, healthPackItr, villainItr, shieldItr;	//iterators for appearance of various occasional objects like stars, asteroids and healthpacks on screen
 	private int score;	//stores the score of player
 	
 	private int xOffset, yOffset;
 	private boolean mouseDown;
 	
+	
 	public SpaceWarriorPanel() {
-		
+		thisPanel = this;
 		sc = new SpaceCraft(this);
 		
 		at = new Thread(new AnimationThread());
@@ -61,6 +69,8 @@ public class SpaceWarriorPanel extends JPanel {
 		asteroids = new ArrayList<Asteroid>();
 		healthPacks = new ArrayList<HealthPack>();
 		villains = new ArrayList<Villain>();
+		villainMissiles1 = new ArrayList<VillainMissile1>();
+		shields = new ArrayList<Shield>();
 		
 		addMouseListener(new MouseAdapter() {
 			@Override
@@ -119,6 +129,10 @@ public class SpaceWarriorPanel extends JPanel {
 		missiles.add(m);
 	}
 	
+	public void addVillainMissile1(VillainMissile1 v) {
+		villainMissiles1.add(v);
+	}
+	
 	@Override
 	public void paintComponent(Graphics g) {
 		Graphics2D g2d = (Graphics2D) g;
@@ -131,6 +145,8 @@ public class SpaceWarriorPanel extends JPanel {
 		drawHealthPacks(g2d);
 		drawAsteroids(g2d);
 		drawCraft(g2d);
+		drawShields(g2d);
+		drawVillainMissiles1(g2d);
 		drawVillains(g2d);
 		drawHealthBar(g2d);
 		drawScore(g2d);
@@ -145,8 +161,14 @@ public class SpaceWarriorPanel extends JPanel {
 		}
 	}
 	private void drawCraft(Graphics2D g2d) {
-		if(sc.isAlive())
+		if(sc.isAlive()) {
 			g2d.drawImage(sc.getImage(), sc.getX(), sc.getY(), this);
+			if(sc.isShieldActive()) {
+				g2d.drawImage(sc.getShieldImage(), sc.getX(), sc.getY(), this);
+				g2d.setColor(Color.white);
+				g2d.drawString(String.valueOf(sc.getShieldRemainingTime()), 20, 492);
+			}
+		}
 		else
 			isAnimating = false;
 	}
@@ -159,10 +181,18 @@ public class SpaceWarriorPanel extends JPanel {
 			}
 		}
 	}
+	private void drawVillainMissiles1(Graphics2D g2d) {
+		synchronized(missiles) {
+			Iterator<VillainMissile1> itrVillainMissile1 = villainMissiles1.iterator();
+			while(itrVillainMissile1.hasNext()) {
+				VillainMissile1 vm = itrVillainMissile1.next();
+				g2d.drawImage(vm.getImage(), vm.getX(), vm.getY(), this);
+			}
+		}
+	}
 	private void drawAsteroids(Graphics2D g2d) {
 		synchronized(asteroids) {
 			Iterator<Asteroid> itrAsteroid = asteroids.iterator();
-			
 			while(itrAsteroid.hasNext()) {
 				Asteroid a = itrAsteroid.next();
 				g2d.drawImage(a.getImage(), a.getX(), a.getY(), this);
@@ -184,6 +214,15 @@ public class SpaceWarriorPanel extends JPanel {
 			while(itrVillain.hasNext()) {
 				Villain v = itrVillain.next();
 				g2d.drawImage(v.getImage(), v.getX(), v.getY(), this);
+			}
+		}
+	}
+	private void drawShields(Graphics2D g2d) {
+		synchronized(shields) {
+			Iterator<Shield> itrShields = shields.iterator();
+			while(itrShields.hasNext()) {
+				Shield s = itrShields.next();
+				g2d.drawImage(s.getImage(), s.getX(), s.getY(), this);
 			}
 		}
 	}
@@ -261,6 +300,12 @@ public class SpaceWarriorPanel extends JPanel {
 				}
 				synchronized(villains) {
 					updateVillains();
+				}
+				synchronized(villainMissiles1) {
+					updateVillainMissiles1();
+				}
+				synchronized(shields) {
+					updateShields();
 				}
 			}
 		}
@@ -365,6 +410,30 @@ public class SpaceWarriorPanel extends JPanel {
 		private void updateCraft() {
 			sc.move();
 		}
+		private void updateShields() {
+			Iterator<Shield> itrShields = shields.iterator();
+			ArrayList<Shield> deadShields = new ArrayList<Shield>();
+			while(itrShields.hasNext()) {
+				Shield s = itrShields.next();
+				s.move();
+				if(CollisionDetector.isColliding(s, sc)) {
+					sc.activateShield();
+					deadShields.add(s);
+				}
+				if(!s.isOnScreen())
+					deadShields.add(s);
+			}
+			itrShields = deadShields.iterator();
+			while(itrShields.hasNext()) {
+				Shield s = itrShields.next();
+				shields.remove(s);
+			}
+			
+			shieldItr = (shieldItr + 1) % (SHIELDS_RATE_LIMITER - RATE_OF_SHIELDS);
+			if(shieldItr == SHIELDS_RATE_LIMITER - RATE_OF_SHIELDS - 1) {
+				shields.add(new Shield());
+			}
+		}
 		private void updateAsteroids() {
 			Iterator<Asteroid> itrAsteroid = asteroids.iterator();
 			ArrayList<Asteroid> deadAsteroid = new ArrayList<Asteroid>();
@@ -372,7 +441,8 @@ public class SpaceWarriorPanel extends JPanel {
 				Asteroid a = itrAsteroid.next();
 				a.move();
 				if(CollisionDetector.isColliding(sc, a)) {
-					sc.damaged(a.getStrength());
+					if(!sc.isShieldActive())
+						sc.damaged(a.getStrength());
 					deadAsteroid.add(a);
 				}
 				if(!a.isOnScreen())
@@ -395,7 +465,8 @@ public class SpaceWarriorPanel extends JPanel {
 				Villain v = itrVillain.next();
 				v.move();
 				if(CollisionDetector.isColliding(v, sc)) {
-					sc.damaged(v.getStrength());
+					if(!sc.isShieldActive())
+						sc.damaged(v.getStrength());
 					deadVillain.add(v);
 				}
 				if(!v.isOnScreen()) {
@@ -409,7 +480,28 @@ public class SpaceWarriorPanel extends JPanel {
 			}
 			villainItr = (villainItr + 1) % (VILLAIN_RATE_LIMITER - RATE_OF_VILLAINS);
 			if(villainItr == 0)
-				villains.add(new Villain());
+				villains.add(new Villain(thisPanel));
+		}
+		private void updateVillainMissiles1() {
+			Iterator<VillainMissile1> itrVillainMissiles1 = villainMissiles1.iterator();
+			ArrayList<VillainMissile1> deadVillainMissiles = new ArrayList<VillainMissile1>();
+			while(itrVillainMissiles1.hasNext()) {
+				VillainMissile1 v = itrVillainMissiles1.next();
+				v.move();
+				if(CollisionDetector.isColliding(v, sc)) {
+					if(!sc.isShieldActive())
+						sc.damaged(2);
+					deadVillainMissiles.add(v);
+				}
+				if(!v.isOnScreen()) {
+					deadVillainMissiles.add(v);
+				}
+			}
+			itrVillainMissiles1 = deadVillainMissiles.iterator();
+			while(itrVillainMissiles1.hasNext()) {
+				VillainMissile1 v = itrVillainMissiles1.next();
+				villainMissiles1.remove(v);
+			}
 		}
 	}
 }
