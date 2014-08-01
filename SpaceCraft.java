@@ -7,11 +7,13 @@ public class SpaceCraft implements SpaceObject {
 	private static int SPEED = 5;
 	
 	private SpaceWarriorPanel swp;
-	private BufferedImage craft;
+	private BufferedImage craft, shieldImage[];
 	
 	private int x, y, width, height;
 	private int dx, dy;
 	private int health;
+	private int shieldTimer;
+	private int currentShieldImage;
 	
 	private long chargeStart;
 	
@@ -25,6 +27,9 @@ public class SpaceCraft implements SpaceObject {
 		isAlive = true;
 		isCharging = false;
 		craft = SpriteSheets.image1.getSubimage(23, 289, width, height);
+		shieldImage = new BufferedImage[2];
+		shieldImage[0] = SpriteSheets.image1.getSubimage(158, 63, 37, 34);
+		shieldImage[1] = SpriteSheets.image1.getSubimage(204, 63, 37, 34);
 		x = 256 - width/2;
 		y = 256 + 128;
 	}
@@ -59,8 +64,23 @@ public class SpaceCraft implements SpaceObject {
             y = y + dy;
     }
 	
+	public void activateShield() {
+		shieldTimer += 50;
+		new Thread(new ShieldThread()).start();
+	}
+	public boolean isShieldActive() {
+		return !(shieldTimer == 0);
+	}
+	public BufferedImage getShieldImage() {
+		return shieldImage[currentShieldImage];
+	}
+	public int getShieldRemainingTime() {
+		return shieldTimer;
+	}
+	
+	
 	public void damaged(int h) {
-		health -= h;
+		 health -= h;
 		 if(health <= 0) {
 			health = 0;
 			isAlive = false;
@@ -127,4 +147,21 @@ public class SpaceCraft implements SpaceObject {
         	fire();
         }
     }
+	
+	private class ShieldThread implements Runnable {
+		@Override
+		public void run() {
+			for(int i = 0; i < 50; i++) {
+				try {
+					Thread.sleep(200);
+				}
+				catch(InterruptedException e) {
+					e.printStackTrace();
+				}
+				currentShieldImage = (currentShieldImage + 1) % 2;
+				shieldTimer--;
+			}
+			shieldTimer = 0;
+		}
+	}
 }
