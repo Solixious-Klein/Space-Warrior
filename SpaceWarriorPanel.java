@@ -1,4 +1,5 @@
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.KeyAdapter;
@@ -47,10 +48,36 @@ public class SpaceWarriorPanel extends JPanel {
 	private boolean isAnimating;	//animation stops if this is false
 	
 	private int starItr, asteroidItr, healthPackItr, villainItr, shieldItr;	//iterators for appearance of various occasional objects like stars, asteroids and healthpacks on screen
-	private int score;	//stores the score of player
+	private int score, highScore;	//stores the score of player
 	
 	public SpaceWarriorPanel() {
+		highScore = 200;
 		thisPanel = this;
+		addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyPressed(KeyEvent e) {
+				int key = e.getKeyCode();
+				if(key == KeyEvent.VK_ESCAPE) {
+					isAnimating = false;
+					SpaceWarrior.exit();
+				}
+				else if(!isAnimating && key == KeyEvent.VK_ENTER) {
+					initialize();
+				}
+				else {
+					sc.keyPressed(e);
+				}
+			}
+			@Override
+			public void keyReleased(KeyEvent e) {
+				sc.keyReleased(e);
+			}
+		});
+		initialize();
+	}
+	
+	private void initialize() {
+		score = 0;
 		sc = new SpaceCraft(this);
 		
 		at = new Thread(new AnimationThread());
@@ -63,24 +90,6 @@ public class SpaceWarriorPanel extends JPanel {
 		villains = new ArrayList<Villain>();
 		villainMissiles1 = new ArrayList<VillainMissile1>();
 		shields = new ArrayList<Shield>();
-		
-		addKeyListener(new KeyAdapter() {
-			@Override
-			public void keyPressed(KeyEvent e) {
-				int key = e.getKeyCode();
-				if(key == KeyEvent.VK_ESCAPE) {
-					isAnimating = false;
-					SpaceWarrior.exit();
-				}
-				else {
-					sc.keyPressed(e);
-				}
-			}
-			@Override
-			public void keyReleased(KeyEvent e) {
-				sc.keyReleased(e);
-			}
-		});
 		
 		isAnimating = true;
 		
@@ -99,9 +108,16 @@ public class SpaceWarriorPanel extends JPanel {
 	@Override
 	public void paintComponent(Graphics g) {
 		Graphics2D g2d = (Graphics2D) g;
-		
 		g2d.setColor(Color.black);
 		g2d.fillRect(0, 0, getWidth(), getHeight());
+		
+		if(!isAnimating) {
+			g2d.setColor(Color.white);
+			//g2d.drawString("Press Enter to start the game", 100, 100);
+			Font f = new Font("Comic Sans MS", Font.BOLD, 20);
+			g2d.setFont(f);
+			g2d.drawString("Press Enter to start the game", SpaceWarrior.WIDTH/2 - 150, SpaceWarrior.HEIGHT/2 - 15);
+		}
 		
 		drawStars(g2d);
 		drawMissiles(g2d);
@@ -186,7 +202,7 @@ public class SpaceWarriorPanel extends JPanel {
 		int health = sc.getHealth();
 		
 		g2d.setColor(Color.white);
-		g2d.fillRoundRect(19, 19, 52, 12, 2, 2);
+		g2d.fillRoundRect(19, 19, 104, 12, 2, 2);
 		if(health == 10)
 			g2d.setColor(new Color(0,255,0));
 		else if(health >= 7)
@@ -196,13 +212,16 @@ public class SpaceWarriorPanel extends JPanel {
 		else
 			g2d.setColor(new Color(0,0,255));
 		
-		g2d.fillRect(20, 20, 5 * health, 10);
+		g2d.fillRect(20, 20, 10 * health, 10);
 		g2d.setColor(new Color(255,0,0));
-		g2d.fillRect(20 + 5 * health, 20, 5 * (10-health), 10);
+		g2d.fillRect(20 + 10 * health, 20, 10 * (10-health), 10);
 	}
 	private void drawScore(Graphics2D g2d) {
+		Font f = new Font("Comic Sans MS", Font.BOLD, 14);
+		g2d.setFont(f);
 		g2d.setColor(Color.white);
 		g2d.drawString(String.valueOf(score), 20, 60);
+		g2d.drawString("High Score : "+String.valueOf(highScore), SpaceWarrior.WIDTH - 150, 60);
 	}
 	
 	private class AnimationThread implements Runnable {
@@ -221,8 +240,8 @@ public class SpaceWarriorPanel extends JPanel {
 				wait = System.currentTimeMillis() - initial;
 				
 				repaint();
-				
 			}
+			repaint();
 		}
 	}
 	
@@ -240,6 +259,9 @@ public class SpaceWarriorPanel extends JPanel {
 				
 				long initial = System.currentTimeMillis();
 				wait = System.currentTimeMillis() - initial;
+				
+				if(highScore < score)
+					highScore = score;
 				
 				updateCraft();
 				synchronized(missiles) {
