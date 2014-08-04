@@ -27,7 +27,7 @@ public class VillainMissile1 implements SpaceObject {
 		if(dx != 0) {
 			direction = Math.atan(dy / dx);
 		}
-		speed = 5;
+		speed = 10;
 		isOnScreen = true;
 	}
 	
@@ -67,7 +67,7 @@ public class VillainMissile1 implements SpaceObject {
 			y = y - (speed * Math.sin(direction));
 		}
 		
-		if(x < 1 - width || x > 512 || y < 1 - height || y > 512) {
+		if(x < 1 - width || x > SpaceWarrior.WIDTH || y < 1 - height || y > SpaceWarrior.HEIGHT) {
 			isOnScreen = false;
 		}
 	}
