@@ -13,7 +13,7 @@ public class SpaceWarriorPanel extends JPanel {
 
 	private SpaceWarriorPanel thisPanel;
 	
-	private static final int FPS = 24;	//Frames per second
+	private static final int FPS = 64;	//Frames per second
 	private static final int WAIT_TIME_CONSTANT = 1000/FPS;	//time in ms the code will wait before repainting the screen
 	private static final int UPDATE_TIME_CONSTANT = 24;
 
