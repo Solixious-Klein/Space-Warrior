@@ -7,6 +7,7 @@ public class Villain implements SpaceObject{
 	private int speed;
 	private int x, y, width, height, health;
 	private int itr;
+	private int score;
 	
 	private BufferedImage image;
 	
@@ -25,11 +26,12 @@ public class Villain implements SpaceObject{
 			width = 27;
 			height = 22;
 		}
-		speed = 1;
-		x = (int)(Math.random()*512);
+		speed = 3;
+		x = (int)(Math.random() * SpaceWarrior.WIDTH);
 		y = 0;
 		isOnScreen = true;
 		health = 4;
+		score = 50;
 	}
 	
 	@Override
@@ -55,7 +57,7 @@ public class Villain implements SpaceObject{
 		if(itr == 99) {
 			fire();
 		}
-		if(y > 512 + height) {
+		if(y > SpaceWarrior.HEIGHT + height) {
 			isOnScreen = false;
 		}
 	}
@@ -66,6 +68,9 @@ public class Villain implements SpaceObject{
 	
 	public int getStrength() {
 		return 3;
+	}
+	public int getScore() {
+		return score;
 	}
 	public boolean isOnScreen() {
 		return isOnScreen;
