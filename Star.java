@@ -33,7 +33,7 @@ public class Star implements SpaceObject {
 			height = 56;
 			star = SpriteSheets.image1.getSubimage(472, 118, width, height);
 		}
-		x = (int)(Math.random()*512+1);
+		x = (int)(Math.random() * SpaceWarrior.WIDTH + 1);
 		y = 1-height;
 		
 		speed = type;
@@ -64,7 +64,7 @@ public class Star implements SpaceObject {
 		if(!isOnScreen)
 			return;
 		y += speed;
-		if(y >= 512) {
+		if(y >= SpaceWarrior.HEIGHT) {
 			isOnScreen = false;
 		}
 	}
