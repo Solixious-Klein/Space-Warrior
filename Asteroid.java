@@ -2,10 +2,13 @@ import java.awt.image.BufferedImage;
 
 
 public class Asteroid implements SpaceObject {
+	private static final int MAX_SPEED = 6;
+	
 	private int speed;
 	private int x, y, width, height;
 	private int type;
-	private int strength;
+	private int strength, health;
+	private int score;
 	
 	private BufferedImage[] asteroids = new BufferedImage[8];
 
@@ -38,6 +41,7 @@ public class Asteroid implements SpaceObject {
 				height = 18;
 			}
 			strength = 2;
+			health = 2;
 		}
 		else if(type >= 5 && type <= 7) {
 			if(type == 5) {
@@ -56,6 +60,7 @@ public class Asteroid implements SpaceObject {
 				height = 31;
 			}
 			strength = 3;
+			health = 3;
 		}
 		else if(type >= 8 && type <= 10) {
 			if(type == 8) {
@@ -74,6 +79,7 @@ public class Asteroid implements SpaceObject {
 				height = 56;
 			}
 			strength = 5;
+			health = 5;
 		}
 		else if(type == 11 || type == 12) {
 			if(type == 11) {
@@ -87,10 +93,12 @@ public class Asteroid implements SpaceObject {
 				height = 31;
 			}
 			strength = 4;
+			health = 4;
 		}
-		x = (int)(Math.random() * (512 - 2 * width) + 1 + width);
+		x = (int)(Math.random() * (SpaceWarrior.WIDTH - 2 * width) + 1 + width);
 		y = 1 - height;
-		speed = (int)(Math.random() * 3 + 1);
+		speed = (int)(Math.random() * MAX_SPEED + 1);
+		score = speed * strength;
 	}
 	
 	@Override
@@ -118,7 +126,7 @@ public class Asteroid implements SpaceObject {
 		if(!isOnScreen)
 			return;
 		y += speed;
-		if(y >= 512) {
+		if(y >= SpaceWarrior.HEIGHT) {
 			isOnScreen = false;
 		}
 		if(y % (speed*10) == 0) {
@@ -138,11 +146,15 @@ public class Asteroid implements SpaceObject {
 		return strength;
 	}
 	public void damaged(int h) {
-		strength -= h;
-		if(strength <= 0) {
+		health -= h;
+		if(health <= 0) {
+			health = 0;
 			strength = 0;
 			isOnScreen = false;
 		}
+	}
+	public int getScore() {
+		return score;
 	}
 	
 	private BufferedImage[] getImages(int x, int y, int width, int height) {
