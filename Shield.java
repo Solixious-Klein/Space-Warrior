@@ -15,7 +15,7 @@ public class Shield implements SpaceObject{
 		width = 29;
 		shield = SpriteSheets.image1.getSubimage(244, 239, width, height);
 		speed = 1;
-		x = (int)(Math.random()*512+1);
+		x = (int)(Math.random() * SpaceWarrior.WIDTH + 1);
 		y = 1-height;
 		isOnScreen = true;
 	}
@@ -41,7 +41,7 @@ public class Shield implements SpaceObject{
 		if(!isOnScreen)
 			return;
 		y += speed;
-		if(y >= 512) {
+		if(y >= SpaceWarrior.HEIGHT) {
 			isOnScreen = false;
 		}
 	}
