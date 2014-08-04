@@ -45,7 +45,7 @@ public class SpaceWarriorPanel extends JPanel {
 	private Thread at;	//animation thread
 	private Thread ut; //updation thred
 	
-	private boolean isAnimating;	//animation stops if this is false
+	private boolean isAnimating, isPaused;	//animation stops if this is false
 	
 	private int starItr, asteroidItr, healthPackItr, villainItr, shieldItr;	//iterators for appearance of various occasional objects like stars, asteroids and healthpacks on screen
 	private int score, highScore;	//stores the score of player
@@ -63,6 +63,9 @@ public class SpaceWarriorPanel extends JPanel {
 				}
 				else if(!isAnimating && key == KeyEvent.VK_ENTER) {
 					initialize();
+				}
+				else if(key == KeyEvent.VK_CONTROL) {
+					isPaused = !isPaused;
 				}
 				else {
 					sc.keyPressed(e);
@@ -92,6 +95,7 @@ public class SpaceWarriorPanel extends JPanel {
 		shields = new ArrayList<Shield>();
 		
 		isAnimating = true;
+		isPaused = false;
 		
 		at.start();
 		ut.start();
@@ -111,14 +115,6 @@ public class SpaceWarriorPanel extends JPanel {
 		g2d.setColor(Color.black);
 		g2d.fillRect(0, 0, getWidth(), getHeight());
 		
-		if(!isAnimating) {
-			g2d.setColor(Color.white);
-			//g2d.drawString("Press Enter to start the game", 100, 100);
-			Font f = new Font("Comic Sans MS", Font.BOLD, 20);
-			g2d.setFont(f);
-			g2d.drawString("Press Enter to start the game", SpaceWarrior.WIDTH/2 - 150, SpaceWarrior.HEIGHT/2 - 15);
-		}
-		
 		drawStars(g2d);
 		drawMissiles(g2d);
 		drawHealthPacks(g2d);
@@ -129,6 +125,14 @@ public class SpaceWarriorPanel extends JPanel {
 		drawVillains(g2d);
 		drawHealthBar(g2d);
 		drawScore(g2d);
+		
+		if(!isAnimating) {
+			g2d.setColor(Color.white);
+			//g2d.drawString("Press Enter to start the game", 100, 100);
+			Font f = new Font("Comic Sans MS", Font.BOLD, 20);
+			g2d.setFont(f);
+			g2d.drawString("Press Enter to start the game", SpaceWarrior.WIDTH/2 - 150, SpaceWarrior.HEIGHT/2 - 15);
+		}
 	}
 	private void drawStars(Graphics2D g2d) {
 		synchronized(stars) {
@@ -235,7 +239,14 @@ public class SpaceWarriorPanel extends JPanel {
 				catch(InterruptedException e) {
 					e.printStackTrace();
 				}
-				
+				while(isPaused) {
+					try {
+						Thread.sleep(100);
+					}
+					catch(InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
 				long initial = System.currentTimeMillis();
 				wait = System.currentTimeMillis() - initial;
 				
@@ -256,7 +267,14 @@ public class SpaceWarriorPanel extends JPanel {
 				catch(InterruptedException e) {
 					e.printStackTrace();
 				}
-				
+				while(isPaused) {
+					try {
+						Thread.sleep(100);
+					}
+					catch(InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
 				long initial = System.currentTimeMillis();
 				wait = System.currentTimeMillis() - initial;
 				
