@@ -4,7 +4,7 @@ import java.awt.image.BufferedImage;
 
 public class SpaceCraft implements SpaceObject {
 	
-	private static int SPEED = 5;
+	private static int SPEED = 7;
 	
 	private SpaceWarriorPanel swp;
 	private BufferedImage craft, shieldImage[];
@@ -58,9 +58,9 @@ public class SpaceCraft implements SpaceObject {
 	@Override
 	public void move()
     {
-        if(x + dx >= 0 && x + dx <= 512 - width)
+        if(x + dx >= 0 && x + dx <= SpaceWarrior.WIDTH - width)
             x = x + dx;
-        if(y + dy >= 0 && y + dy <= 512 - width)
+        if(y + dy >= 0 && y + dy <= SpaceWarrior.HEIGHT - width)
             y = y + dy;
     }
 	
