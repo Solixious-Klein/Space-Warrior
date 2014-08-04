@@ -22,7 +22,7 @@ public class HealthPack implements SpaceObject {
 			healthPack[i] = SpriteSheets.image1.getSubimage(59, (height * i) + 194, width, height);
 		}
 		
-		x = (int)(Math.random() * 512 + 1 - width);
+		x = (int)(Math.random() * SpaceWarrior.WIDTH + 1 - width);
 		y = 1-height;
 	}
 
@@ -48,7 +48,7 @@ public class HealthPack implements SpaceObject {
 		y += speed;
 		if(y%height == 0)
 		currentImage = (currentImage + 1) % 6;
-		if(y >= 512) {
+		if(y >= SpaceWarrior.HEIGHT) {
 			isOnScreen = false;
 		}
 	}
