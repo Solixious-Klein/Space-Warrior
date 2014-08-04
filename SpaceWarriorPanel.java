@@ -24,12 +24,14 @@ public class SpaceWarriorPanel extends JPanel {
 	private static final int HEALTHPACKS_RATE_LIMITER = 3500;
 	private static final int VILLAIN_RATE_LIMITER = 400;
 	private static final int SHIELDS_RATE_LIMITER = 2500;
+	private static final int SPACE_BOMB_RATE_LIMITER = 250;
 	
 	private static int RATE_OF_ASTEROIDS = 80; //rate of asteroids fall
 	private static int RATE_OF_STARS = 50;	//rate of stars appearing
 	private static int RATE_OF_HEALTHPACKS = 0;	//rate of appearance of health packs
 	private static int RATE_OF_VILLAINS = 300;	//rate of appearance of villains
-	private static int RATE_OF_SHIELDS = 10;	//rate of appearance of villains
+	private static int RATE_OF_SHIELDS = 10;	//rate of appearance of shield ups
+	private static int RATE_OF_SPACE_BOMBS = 50;	//rate of space bombs
 	
 	
 	private ArrayList<Missile> missiles;	//list of player's missiles on screen
@@ -39,6 +41,7 @@ public class SpaceWarriorPanel extends JPanel {
 	private ArrayList<Villain> villains;	//list of villains on screen 
 	private ArrayList<VillainMissile1> villainMissiles1;
 	private ArrayList<Shield> shields;
+	private ArrayList<SpaceBomb> spaceBombs;
 	
 	
 	protected static SpaceCraft sc;	//the space craft's object
@@ -47,8 +50,10 @@ public class SpaceWarriorPanel extends JPanel {
 	
 	private boolean isAnimating, isPaused;	//animation stops if this is false
 	
-	private int starItr, asteroidItr, healthPackItr, villainItr, shieldItr;	//iterators for appearance of various occasional objects like stars, asteroids and healthpacks on screen
-	private int score, highScore;	//stores the score of player
+	private int starItr, asteroidItr, healthPackItr, villainItr, shieldItr, spaceBombItr;	//iterators for appearance of various occasional objects like stars, asteroids and healthpacks on screen
+	private int score, actualScore, highScore;	//stores the score of player
+	
+	private long initialTime;
 	
 	public SpaceWarriorPanel() {
 		highScore = 1000;
@@ -93,9 +98,12 @@ public class SpaceWarriorPanel extends JPanel {
 		villains = new ArrayList<Villain>();
 		villainMissiles1 = new ArrayList<VillainMissile1>();
 		shields = new ArrayList<Shield>();
+		spaceBombs = new ArrayList<SpaceBomb>();
 		
 		isAnimating = true;
 		isPaused = false;
+		
+		initialTime = System.currentTimeMillis();
 		
 		at.start();
 		ut.start();
@@ -122,13 +130,13 @@ public class SpaceWarriorPanel extends JPanel {
 		drawCraft(g2d);
 		drawShields(g2d);
 		drawVillainMissiles1(g2d);
+		drawSpaceBombs(g2d);
 		drawVillains(g2d);
 		drawHealthBar(g2d);
 		drawScore(g2d);
 		
 		if(!isAnimating) {
 			g2d.setColor(Color.white);
-			//g2d.drawString("Press Enter to start the game", 100, 100);
 			Font f = new Font("Comic Sans MS", Font.BOLD, 20);
 			g2d.setFont(f);
 			g2d.drawString("Press Enter to start the game", SpaceWarrior.WIDTH/2 - 150, SpaceWarrior.HEIGHT/2 - 15);
@@ -194,6 +202,14 @@ public class SpaceWarriorPanel extends JPanel {
 			}
 		}
 	}
+	private void drawSpaceBombs(Graphics2D g2d) {
+		synchronized(spaceBombs) {
+			for(int i = 0; i < spaceBombs.size(); i++) {
+				SpaceBomb sb = spaceBombs.get(i);
+				g2d.drawImage(sb.getImage(), sb.getX(), sb.getY(), this);
+			}
+		}
+	}
 	private void drawShields(Graphics2D g2d) {
 		synchronized(shields) {
 			for(int i = 0; i < shields.size(); i++) {
@@ -221,11 +237,15 @@ public class SpaceWarriorPanel extends JPanel {
 		g2d.fillRect(20 + 10 * health, 20, 10 * (10-health), 10);
 	}
 	private void drawScore(Graphics2D g2d) {
+		long timeSurvived = (System.currentTimeMillis() - initialTime)/1000;
+		
 		Font f = new Font("Comic Sans MS", Font.BOLD, 14);
+		actualScore = (int)(score + timeSurvived);
 		g2d.setFont(f);
 		g2d.setColor(Color.white);
-		g2d.drawString(String.valueOf(score), 20, 60);
-		g2d.drawString("High Score : "+String.valueOf(highScore), SpaceWarrior.WIDTH - 150, 60);
+		g2d.drawString("Score:"+String.valueOf(actualScore), 20, 60);
+		g2d.drawString("Time Survived:"+String.valueOf(timeSurvived)+"s", 20, 90);
+		g2d.drawString("High Score:"+String.valueOf(highScore), SpaceWarrior.WIDTH - 150, 60);
 	}
 	
 	private class AnimationThread implements Runnable {
@@ -278,7 +298,7 @@ public class SpaceWarriorPanel extends JPanel {
 				long initial = System.currentTimeMillis();
 				wait = System.currentTimeMillis() - initial;
 				
-				if(highScore < score)
+				if(highScore < actualScore)
 					highScore = score;
 				
 				updateCraft();
@@ -302,6 +322,9 @@ public class SpaceWarriorPanel extends JPanel {
 				}
 				synchronized(shields) {
 					updateShields();
+				}
+				synchronized(spaceBombs) {
+					updateSpaceBombs();
 				}
 			}
 		}
@@ -346,12 +369,55 @@ public class SpaceWarriorPanel extends JPanel {
 					Villain v = deadVillain.get(j);
 					villains.remove(v);
 				}
-			}   
+				
+				ArrayList<SpaceBomb> deadSpaceBombs = new ArrayList<SpaceBomb>();
+				for(int j = 0; j < spaceBombs.size(); j++) {
+					SpaceBomb sb = spaceBombs.get(j);
+					if(CollisionDetector.isColliding(m, sb)) {
+						sb.damaged(m.getStrength());
+						deadMissile.add(m);
+					}
+					if(!sb.isOnScreen()) {
+						deadSpaceBombs.add(sb);
+						score += sb.getScore();
+					}
+				}
+				for(int j = 0; j < deadSpaceBombs.size(); j++) {
+					SpaceBomb sb = deadSpaceBombs.get(j);
+					spaceBombs.remove(sb);
+				}
+			}
+			
 			
 			for(int i = 0; i < deadMissile.size(); i++) {
 				Missile m = deadMissile.get(i);
 				missiles.remove(m);
 			}
+		}
+		private void updateSpaceBombs() {
+			ArrayList<SpaceBomb> deadSpaceBombs = new ArrayList<SpaceBomb>();
+			for(int i = 0; i < spaceBombs.size(); i++) {
+				SpaceBomb sb = spaceBombs.get(i);
+				sb.move();
+				if(CollisionDetector.isColliding(sc, sb)) {
+					if(!sc.isShieldActive())
+						sc.damaged(sb.getStrength());
+					else
+						score += sb.getScore();
+					deadSpaceBombs.add(sb);
+				}
+				if(!sb.isOnScreen())
+					deadSpaceBombs.add(sb);
+			}
+			
+			for(int i = 0; i < deadSpaceBombs.size(); i++) {
+				SpaceBomb sb = deadSpaceBombs.get(i);
+				spaceBombs.remove(sb);
+			}
+			
+			spaceBombItr = (spaceBombItr + 1) % (SPACE_BOMB_RATE_LIMITER - RATE_OF_SPACE_BOMBS);
+			if(spaceBombItr == 0) 
+				spaceBombs.add(new SpaceBomb());
 		}
 		private void updateStars() {
 			ArrayList<Star> deadStar = new ArrayList<Star>();
