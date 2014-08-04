@@ -51,7 +51,7 @@ public class SpaceWarriorPanel extends JPanel {
 	private int score, highScore;	//stores the score of player
 	
 	public SpaceWarriorPanel() {
-		highScore = 200;
+		highScore = 1000;
 		thisPanel = this;
 		addKeyListener(new KeyAdapter() {
 			@Override
@@ -202,7 +202,7 @@ public class SpaceWarriorPanel extends JPanel {
 		int health = sc.getHealth();
 		
 		g2d.setColor(Color.white);
-		g2d.fillRoundRect(19, 19, 104, 12, 2, 2);
+		g2d.fillRoundRect(19, 19, 102, 12, 2, 2);
 		if(health == 10)
 			g2d.setColor(new Color(0,255,0));
 		else if(health >= 7)
