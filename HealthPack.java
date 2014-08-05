@@ -56,8 +56,16 @@ public class HealthPack implements SpaceObject {
 	public BufferedImage getImage() {
 		return healthPack[currentImage];
 	}
+	@Override
 	public boolean isOnScreen() {
 		return isOnScreen;
+	}
+	@Override
+	public int getStrength() {
+		return 0;
+	}
+	public void damaged(int v) {
+		
 	}
 	public void removeFromScreen() {
 		isOnScreen = false;
