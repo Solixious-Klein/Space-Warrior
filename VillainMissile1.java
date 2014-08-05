@@ -6,6 +6,7 @@ public class VillainMissile1 implements SpaceObject {
 	private double x, y;
 	private int scX, scY;
 	private int width, height;
+	private int strength;
 	private BufferedImage missile;
 	private static int speed;
 	
@@ -29,6 +30,7 @@ public class VillainMissile1 implements SpaceObject {
 		}
 		speed = 10;
 		isOnScreen = true;
+		strength = 2;
 	}
 	
 	@Override
@@ -75,7 +77,18 @@ public class VillainMissile1 implements SpaceObject {
 	public BufferedImage getImage() {
 		return missile;
 	}
+	@Override
 	public boolean isOnScreen() {
 		return isOnScreen;
+	}
+
+	@Override
+	public int getStrength() {
+		return strength;
+	}
+
+	@Override
+	public void damaged(int v) {
+		isOnScreen = false;
 	}
 }
