@@ -17,21 +17,21 @@ public class SpaceCraft implements SpaceObject {
 	
 	private long chargeStart;
 	
-	private boolean isAlive, isCharging;
+	private boolean isOnScreen, isCharging;
 	
 	public SpaceCraft(SpaceWarriorPanel swp) {
 		this.swp = swp;
 		width = 32;
 		height = 32;
 		health = 10;
-		isAlive = true;
+		isOnScreen = true;
 		isCharging = false;
 		craft = SpriteSheets.image1.getSubimage(23, 289, width, height);
 		shieldImage = new BufferedImage[2];
 		shieldImage[0] = SpriteSheets.image1.getSubimage(158, 63, 37, 34);
 		shieldImage[1] = SpriteSheets.image1.getSubimage(204, 63, 37, 34);
-		x = 256 - width/2;
-		y = 256 + 128;
+		x = SpaceWarrior.WIDTH / 2 - width / 2;
+		y = 3 * SpaceWarrior.HEIGHT / 4;
 	}
 	
 	@Override
@@ -83,7 +83,7 @@ public class SpaceCraft implements SpaceObject {
 		 health -= h;
 		 if(health <= 0) {
 			health = 0;
-			isAlive = false;
+			isOnScreen = false;
 		 }
 		 if(health>10)
 			 health = 10;
@@ -91,8 +91,13 @@ public class SpaceCraft implements SpaceObject {
 	public int getHealth() {
 		return health;
 	}
-	public boolean isAlive() {
-		return isAlive;
+	@Override
+	public boolean isOnScreen() {
+		return isOnScreen;
+	}
+	@Override
+	public int getStrength() {
+		return 999;
 	}
 	public void fire() {
 		long charge = System.currentTimeMillis() - chargeStart;
