@@ -69,10 +69,15 @@ public class Missile implements SpaceObject{
 		}
 	}
 	
-	
+	@Override
 	public int getStrength() {
 		return strength;
 	}
+	@Override
+	public void damaged(int v) {
+		isOnScreen = false;
+	}
+	@Override
 	public boolean isOnScreen() {
 		return isOnScreen;
 	}
