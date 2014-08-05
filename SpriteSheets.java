@@ -1,5 +1,4 @@
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
@@ -14,9 +13,9 @@ public class SpriteSheets {
 	
 	static {
 		try {
-			image1 = ImageIO.read(new File(file1));
-			image2 = ImageIO.read(new File(file2));
-			image3 = ImageIO.read(new File(file3));
+			image1 = ImageIO.read(SpriteSheets.class.getResourceAsStream(file1));
+			image2 = ImageIO.read(SpriteSheets.class.getResourceAsStream(file2));
+			image3 = ImageIO.read(SpriteSheets.class.getResourceAsStream(file3));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
