@@ -151,7 +151,7 @@ public class SpaceWarriorPanel extends JPanel {
 		}
 	}
 	private void drawCraft(Graphics2D g2d) {
-		if(sc.isAlive()) {
+		if(sc.isOnScreen()) {
 			g2d.drawImage(sc.getImage(), sc.getX(), sc.getY(), this);
 			if(sc.isShieldActive()) {
 				g2d.drawImage(sc.getShieldImage(), sc.getX(), sc.getY(), this);
@@ -299,7 +299,7 @@ public class SpaceWarriorPanel extends JPanel {
 				wait = System.currentTimeMillis() - initial;
 				
 				if(highScore < actualScore)
-					highScore = score;
+					highScore = actualScore;
 				
 				updateCraft();
 				synchronized(missiles) {
