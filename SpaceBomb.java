@@ -52,6 +52,7 @@ public class SpaceBomb implements SpaceObject {
 	public int getHeight() {
 		return height;
 	}
+	@Override
 	public void damaged(int d) {
 		health -= d;
 		if(health <= 0) {
@@ -78,13 +79,15 @@ public class SpaceBomb implements SpaceObject {
 	public BufferedImage getImage() {
 		return bombImages[currentX][currentY];
 	}
+	@Override
 	public int getStrength() {
 		return strength;
 	}
+	
 	public int getScore() {
 		return score;
 	}
-	
+	@Override
 	public boolean isOnScreen() {
 		return isOnScreen;
 	}
