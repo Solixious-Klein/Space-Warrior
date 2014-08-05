@@ -50,8 +50,17 @@ public class Shield implements SpaceObject{
 		return shield;
 	}
 	
-	
+	@Override
 	public boolean isOnScreen() {
 		return isOnScreen;
+	}
+	
+	@Override
+	public int getStrength() {
+		return 0;
+	}
+	@Override
+	public void damaged(int v) {
+		
 	}
 }
