@@ -72,7 +72,16 @@ public class Star implements SpaceObject {
 	public int getType() {
 		return type;
 	}
+	@Override
 	public boolean isOnScreen() {
 		return isOnScreen;
+	}
+	@Override
+	public int getStrength() {
+		return 0;
+	}
+	@Override
+	public void damaged(int v) {
+		
 	}
 }
