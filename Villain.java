@@ -17,14 +17,14 @@ public class Villain implements SpaceObject{
 		this.swp = swp;
 		int type = (int)(Math.random()*2) + 1;
 		if(type == 1) {
-			image = SpriteSheets.image1.getSubimage(92, 188, 27, 22);
 			width = 27;
 			height = 22;
+			image = SpriteSheets.image1.getSubimage(92, 188, width, height);
 		}
 		else if(type == 2){
-			image = SpriteSheets.image1.getSubimage(92, 161, 27, 22);
 			width = 27;
 			height = 22;
+			image = SpriteSheets.image1.getSubimage(92, 161, width, height);
 		}
 		speed = 3;
 		x = (int)(Math.random() * SpaceWarrior.WIDTH);
@@ -65,16 +65,18 @@ public class Villain implements SpaceObject{
 	public BufferedImage getImage() {
 		return image;
 	}
-	
+	@Override
 	public int getStrength() {
 		return 3;
 	}
 	public int getScore() {
 		return score;
 	}
+	@Override
 	public boolean isOnScreen() {
 		return isOnScreen;
 	}
+	@Override
 	public void damaged(int d) {
 		health -= d;
 		if(health <= 0) {
