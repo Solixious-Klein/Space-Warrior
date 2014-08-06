@@ -88,6 +88,13 @@ public class SpaceWarriorPanel extends JPanel {
 	
 	private void initialize() {
 		
+		starItr = 0;
+		asteroidItr = 0;
+		healthPackItr = 0;
+		villainItr = 0;
+		shieldItr = 0;
+		spaceBombItr = 0;
+		
 		RATE_OF_ASTEROIDS = 60;
 		RATE_OF_STARS = 50;
 		RATE_OF_HEALTHPACKS = 0;
