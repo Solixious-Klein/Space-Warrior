@@ -6,16 +6,20 @@ public class SpaceBomb implements SpaceObject {
 	private static final int SPEED_OF_ROTATION = 10;
 	private static final int SPEED = 2;
 	
+	private SpaceWarriorPanel swp;
+	
 	private int x, y, height, width;
 	private int health, score, strength;
 	private int currentX, currentY;
 	private int updateCounter;
+	private int itr;
 	
 	private boolean isOnScreen;
 	
 	public BufferedImage bombImages[][] = new BufferedImage[16][2];
 	
-	public SpaceBomb() {
+	public SpaceBomb(SpaceWarriorPanel swp) {
+		this.swp = swp;
 		health = 10;
 		strength = 8;
 		score = 100;
@@ -62,6 +66,7 @@ public class SpaceBomb implements SpaceObject {
 	}
 	@Override
 	public void move() {
+		itr = (itr + 1) % 40;
 		updateCounter = (updateCounter + 1) % SPEED_OF_ROTATION;
 		if(updateCounter == 0) {
 			currentX = (currentX + 1) % 16;
@@ -72,6 +77,11 @@ public class SpaceBomb implements SpaceObject {
 		}
 		if(x > SpaceWarriorPanel.sc.getX()  && y < SpaceWarriorPanel.sc.getY()) {
 			x = x - (SPEED);
+		}
+		if(itr % 40 == 0 && 
+				Math.abs(x - SpaceWarriorPanel.sc.getX()) < width + SpaceWarriorPanel.sc.getWidth() && 
+				y < SpaceWarriorPanel.sc.getY()) {
+			fire();
 		}
 		y += SPEED;
 	}
@@ -90,5 +100,9 @@ public class SpaceBomb implements SpaceObject {
 	@Override
 	public boolean isOnScreen() {
 		return isOnScreen;
+	}
+	public void fire() {
+		VillainMissile2 v = new VillainMissile2(x + (int)(0.5 * width), y + (int)(0.5 * height));
+		swp.addVillainMissile2(v);
 	}
 }
