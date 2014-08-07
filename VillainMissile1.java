@@ -20,9 +20,9 @@ public class VillainMissile1 implements SpaceObject {
 		scY = SpaceWarriorPanel.sc.getY() + (int)(0.5 * SpaceWarriorPanel.sc.getHeight());
 		this.x = x;
 		this.y = y;
-		missile = SpriteSheets.image1.getSubimage(174, 218, 5, 5);
 		width = 5;
 		height = 5;
+		missile = SpriteSheets.image1.getSubimage(174, 218, width, height);
 		dx = scX - x;
 		dy = scY - y;
 		if(dx != 0) {
