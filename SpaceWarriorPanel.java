@@ -4,6 +4,12 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.swing.JPanel;
@@ -41,13 +47,15 @@ public class SpaceWarriorPanel extends JPanel {
 	private ArrayList<Villain> villains;	//list of villains on screen 
 	private ArrayList<VillainMissile1> villainMissiles1;
 	private ArrayList<VillainMissile2> villainMissiles2;
+	private ArrayList<VillainMissile3> villainMissiles3;
 	private ArrayList<Shield> shields;
 	private ArrayList<SpaceBomb> spaceBombs;
+	private Boss boss;
 	
 	
 	protected static SpaceCraft sc;	//the space craft's object
 	private Thread at;	//animation thread
-	private Thread ut; //updation thred
+	private Thread ut; //updation thread
 	
 	private boolean isAnimating, isPaused;	//animation stops if this is false
 	private boolean asteroidsPresence, villainsPresence, spaceBombsPresence, shieldsPresence, healthPacksPresence;
@@ -58,7 +66,7 @@ public class SpaceWarriorPanel extends JPanel {
 	private long initialTime;
 	
 	public SpaceWarriorPanel() {
-		highScore = 1000;
+		highScore = getHighScore();
 		thisPanel = this;
 		addKeyListener(new KeyAdapter() {
 			@Override
@@ -97,7 +105,7 @@ public class SpaceWarriorPanel extends JPanel {
 		
 		RATE_OF_ASTEROIDS = 60;
 		RATE_OF_STARS = 50;
-		RATE_OF_HEALTHPACKS = 0;
+		RATE_OF_HEALTHPACKS = 100;
 		RATE_OF_VILLAINS = 300;
 		RATE_OF_SHIELDS = 10;
 		RATE_OF_SPACE_BOMBS = 50;
@@ -115,8 +123,10 @@ public class SpaceWarriorPanel extends JPanel {
 		villains = new ArrayList<Villain>();
 		villainMissiles1 = new ArrayList<VillainMissile1>();
 		villainMissiles2 = new ArrayList<VillainMissile2>();
+		villainMissiles3 = new ArrayList<VillainMissile3>();
 		shields = new ArrayList<Shield>();
 		spaceBombs = new ArrayList<SpaceBomb>();
+		boss = new Boss(this);
 		
 		isAnimating = true;
 		isPaused = false;
@@ -131,6 +141,41 @@ public class SpaceWarriorPanel extends JPanel {
 		at.start();
 		ut.start();
 	}
+	private void updateHighScore() {
+		File file = new File("info.dat");
+		if(!file.exists()) {
+			try {
+				file.createNewFile();
+			}
+			catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		try {
+			BufferedWriter bw = new BufferedWriter(new FileWriter(file, false));
+			bw.write(String.valueOf(highScore));
+			bw.close();
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+	private int getHighScore() {
+		File file = new File("info.dat");
+		if(!file.exists())
+			return 1000;
+		try {
+			BufferedReader br = new BufferedReader(new FileReader(file));
+			int sc = Integer.parseInt(br.readLine());
+			br.close();
+			return sc;
+			
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		return 1000;
+	}
 	
 	public void addMissile(Missile m) {
 		missiles.add(m);
@@ -141,6 +186,9 @@ public class SpaceWarriorPanel extends JPanel {
 	}
 	public void addVillainMissile2(VillainMissile2 v) {
 		villainMissiles2.add(v);
+	}
+	public void addVillainMissile3(VillainMissile3 v) {
+		villainMissiles3.add(v);
 	}
 	
 	private void setVillainsEnabled(boolean b) {
@@ -173,6 +221,7 @@ public class SpaceWarriorPanel extends JPanel {
 		drawShields(g2d);
 		drawVillainMissiles1(g2d);
 		drawVillainMissiles2(g2d);
+		drawVillainMissiles3(g2d);
 		drawSpaceBombs(g2d);
 		drawVillains(g2d);
 		drawHealthBar(g2d);
@@ -204,6 +253,10 @@ public class SpaceWarriorPanel extends JPanel {
 		}
 		else
 			isAnimating = false;
+		
+		if(boss.isOnScreen()) {
+			g2d.drawImage(boss.getImage(), boss.getX(), boss.getY(), this);
+		}
 	}
 	private void drawMissiles(Graphics2D g2d) {
 		synchronized(missiles) {
@@ -225,6 +278,14 @@ public class SpaceWarriorPanel extends JPanel {
 		synchronized(villainMissiles2) {
 			for(int i = 0; i < villainMissiles2.size(); i++) {
 				VillainMissile2 vm = villainMissiles2.get(i);
+				g2d.drawImage(vm.getImage(), vm.getX(), vm.getY(), this);
+			}
+		}
+	}
+	private void drawVillainMissiles3(Graphics2D g2d) {
+		synchronized(villainMissiles3) {
+			for(int i = 0; i < villainMissiles3.size(); i++) {
+				VillainMissile3 vm = villainMissiles3.get(i);
 				g2d.drawImage(vm.getImage(), vm.getX(), vm.getY(), this);
 			}
 		}
@@ -349,8 +410,10 @@ public class SpaceWarriorPanel extends JPanel {
 				long initial = System.currentTimeMillis();
 				wait = System.currentTimeMillis() - initial;
 				
-				if(highScore < actualScore)
+				if(highScore < actualScore) {
 					highScore = actualScore;
+					updateHighScore();
+				}
 				
 				if(actualScore > 3) {
 					setAsteroidsEnabled(true);
@@ -369,20 +432,24 @@ public class SpaceWarriorPanel extends JPanel {
 				if(actualScore > 1000) {
 					RATE_OF_ASTEROIDS = 90;
 				}
-				if(actualScore > 1250) {
+				if(actualScore > 1500) {
 					RATE_OF_VILLAINS = 340;
 				}
-				if(actualScore > 1500) {
+				if(actualScore > 2000) {
 					RATE_OF_SPACE_BOMBS = 100;
 				}
-				if(actualScore > 2000) {
+				if(actualScore > 2500) {
 					RATE_OF_SPACE_BOMBS = 150;
 				}
-				if(actualScore > 2500) {
+				if(actualScore > 3000) {
 					RATE_OF_SPACE_BOMBS = 200;
 				}
-				if(actualScore > 3000) {
+				if(actualScore > 3500) {
 					RATE_OF_SPACE_BOMBS = 250;
+				}
+				
+				if(actualScore > 5000 && !boss.isOnScreen() && boss.getHealth() > 0) {
+					boss.enter();
 				}
 				
 				updateCraft();
@@ -407,11 +474,17 @@ public class SpaceWarriorPanel extends JPanel {
 				synchronized(villainMissiles2) {
 					updateVillainMissiles2();
 				}
+				synchronized(villainMissiles3) {
+					updateVillainMissiles3();
+				}
 				synchronized(shields) {
 					updateShields();
 				}
 				synchronized(spaceBombs) {
 					updateSpaceBombs();
+				}
+				synchronized(boss) {
+					updateBoss();
 				}
 			}
 		}
@@ -472,6 +545,14 @@ public class SpaceWarriorPanel extends JPanel {
 				for(int j = 0; j < deadSpaceBombs.size(); j++) {
 					SpaceBomb sb = deadSpaceBombs.get(j);
 					spaceBombs.remove(sb);
+				}
+				
+				if(CollisionDetector.isColliding(boss, m) && boss.isOnScreen()) {
+					boss.damaged(m.getStrength());
+					deadMissile.add(m);
+					if(!boss.isOnScreen()) {
+						//victory conditions met
+					}
 				}
 			}
 			
@@ -658,6 +739,35 @@ public class SpaceWarriorPanel extends JPanel {
 			for(int i = 0; i < deadVillainMissiles.size(); i++) {
 				VillainMissile2 v = deadVillainMissiles.get(i);
 				villainMissiles2.remove(v);
+			}
+		}
+		
+		private void updateVillainMissiles3() {
+			ArrayList<VillainMissile3> deadVillainMissiles = new ArrayList<VillainMissile3>();
+			for(int i = 0; i < villainMissiles3.size(); i++) {
+				VillainMissile3 v = villainMissiles3.get(i);
+				v.move();
+				if(CollisionDetector.isColliding(v, sc)) {
+					if(!sc.isShieldActive())
+						sc.damaged(v.getStrength());
+					deadVillainMissiles.add(v);
+				}
+				if(!v.isOnScreen()) {
+					deadVillainMissiles.add(v);
+				}
+			}
+			for(int i = 0; i < deadVillainMissiles.size(); i++) {
+				VillainMissile3 v = deadVillainMissiles.get(i);
+				villainMissiles3.remove(v);
+			}
+		}
+		
+		private void updateBoss() {
+			if(boss.isOnScreen()) {
+				boss.move();
+				if(CollisionDetector.isColliding(boss, sc)) {
+					sc.damaged(boss.getStrength());
+				}
 			}
 		}
 	}
