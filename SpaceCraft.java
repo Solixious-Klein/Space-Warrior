@@ -11,7 +11,7 @@ public class SpaceCraft implements SpaceObject {
 	
 	private int x, y, width, height;
 	private int dx, dy;
-	private int health;
+	private int health, strength;
 	private int shieldTimer;
 	private int currentShieldImage;
 	
@@ -24,6 +24,7 @@ public class SpaceCraft implements SpaceObject {
 		width = 32;
 		height = 32;
 		health = 10;
+		strength = 100;
 		isOnScreen = true;
 		isCharging = false;
 		craft = SpriteSheets.image1.getSubimage(23, 289, width, height);
@@ -97,7 +98,7 @@ public class SpaceCraft implements SpaceObject {
 	}
 	@Override
 	public int getStrength() {
-		return 999;
+		return strength;
 	}
 	public void fire() {
 		long charge = System.currentTimeMillis() - chargeStart;
