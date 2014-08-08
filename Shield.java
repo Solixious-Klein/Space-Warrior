@@ -1,42 +1,23 @@
 import java.awt.image.BufferedImage;
 
 
-public class Missile implements SpaceObject{
+public class Shield implements SpaceObject{
 	
-	public final static int LOW = 1;
-	public final static int MEDIUM = 3;
-	public final static int HIGH = 5;
-	
-	private static int SPEED = 10;
+	private int speed;
 	private int x, y, width, height;
-	private int strength;
 	
-	private BufferedImage missile;
+	private BufferedImage shield;
 	
 	private boolean isOnScreen;
 	
-	public Missile(int x, int y, int strength) {
-		this.x = x;
-		this.y = y;
-		this.strength = strength;
-		
+	public Shield() {
+		height = 17;
+		width = 29;
+		shield = SpriteSheets.image1.getSubimage(244, 239, width, height);
+		speed = 1;
+		x = (int)(Math.random() * SpaceWarrior.WIDTH + 1);
+		y = 1-height;
 		isOnScreen = true;
-		
-		if(strength == LOW) {
-			width = 5;
-			height = 5;
-			missile = SpriteSheets.image1.getSubimage(108, 218, width, height);
-		}
-		else if(strength == MEDIUM) {
-			width = 8;
-			height = 8;
-			missile = SpriteSheets.image1.getSubimage(121, 217, width, height);
-		}
-		else if(strength == HIGH) {
-			width = 13;
-			height = 13;
-			missile = SpriteSheets.image1.getSubimage(150, 215, width, height);
-		} 
 	}
 	
 	@Override
@@ -56,32 +37,30 @@ public class Missile implements SpaceObject{
 		return height;
 	}
 	@Override
-	public BufferedImage getImage() {
-		return missile;
-	}
-	@Override
 	public void move() {
 		if(!isOnScreen)
 			return;
-		y -= SPEED;
-		if(y <= -height) {
+		y += speed;
+		if(y >= SpaceWarrior.HEIGHT) {
 			isOnScreen = false;
 		}
 	}
+	@Override
+	public BufferedImage getImage() {
+		return shield;
+	}
 	
-	@Override
-	public int getStrength() {
-		return strength;
-	}
-	@Override
-	public void damaged(int v) {
-		isOnScreen = false;
-	}
 	@Override
 	public boolean isOnScreen() {
 		return isOnScreen;
 	}
-	public void removeFromScreen() {
-		isOnScreen = false;
+	
+	@Override
+	public int getStrength() {
+		return 0;
+	}
+	@Override
+	public void damaged(int v) {
+		
 	}
 }
