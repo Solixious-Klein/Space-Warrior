@@ -13,7 +13,7 @@ public class Boss implements SpaceObject{
 	private int x, y;
 	private int speed;
 	
-	private int itr;
+	private int itr, itr2;
 	
 	private boolean isOnScreen;
 	
@@ -35,7 +35,7 @@ public class Boss implements SpaceObject{
 		currentImage = 0;
 		phase = ENTERING;
 		
-		health = 5;
+		health = 100;
 		y = 1 - bossImages[currentImage].getHeight();
 		x = (SpaceWarrior.WIDTH / 2) - (bossImages[currentImage].getWidth() / 2);
 		strength = 999;
@@ -74,6 +74,7 @@ public class Boss implements SpaceObject{
 	@Override
 	public void move() {
 		itr = (itr + 1) % 30;
+		itr2 = (itr2 + 1) % 145;
 		if(phase == ENTERING) {
 			y += speed;
 			if(y >= SpaceWarrior.HEIGHT/3 - getHeight())
@@ -84,6 +85,8 @@ public class Boss implements SpaceObject{
 		int scWidth = SpaceWarriorPanel.sc.getWidth();
 		if(itr == 10 && x - scWidth <= scX && x + scWidth + getWidth() >= scX && y + getHeight() < scY)
 			fire();
+		if(itr2 == 25)
+			fire2();
 		if(x > scX) {
 			x -= speed;
 		}
@@ -114,5 +117,9 @@ public class Boss implements SpaceObject{
 		swp.addVillainMissile3(vm2);
 		swp.addVillainMissile3(vm3);
 		swp.addVillainMissile3(vm4);
+	}
+	public void fire2() {
+		VillainMissile4 vm5 = new VillainMissile4(x + (getWidth() / 2), y + (getHeight() / 2));
+		swp.addVillainMissile4(vm5);
 	}
 }
