@@ -12,11 +12,12 @@ public class SpaceBomb implements SpaceObject {
 	private int health, score, strength;
 	private int currentX, currentY;
 	private int updateCounter;
-	private int itr;
+	private int itr, explosionItr;
 	
-	private boolean isOnScreen;
+	private boolean isOnScreen, isExploding;
 	
-	public BufferedImage bombImages[][] = new BufferedImage[16][2];
+	private BufferedImage bombImages[][] = new BufferedImage[16][2];
+	private BufferedImage explosionImages[];
 	
 	public SpaceBomb(SpaceWarriorPanel swp) {
 		this.swp = swp;
@@ -38,6 +39,13 @@ public class SpaceBomb implements SpaceObject {
 		currentX = 0;
 		currentY = 0;
 		isOnScreen = true;
+		
+		explosionImages = new BufferedImage[16];
+		int in = 2;
+		for(int i = 0; i < 16; i++) {
+			explosionImages[i] = SpriteSheets.explosion[in].getSubimage(64 * (i % 4), 64 * (i / 4), 64, 64);
+		}
+		
 	}
 	
 	@Override
@@ -61,7 +69,7 @@ public class SpaceBomb implements SpaceObject {
 		health -= d;
 		if(health <= 0) {
 			health = 0;
-			isOnScreen = false;
+			explode();
 		}
 	}
 	@Override
@@ -84,16 +92,25 @@ public class SpaceBomb implements SpaceObject {
 			fire();
 		}
 		y += SPEED;
+		if(explosionItr == 15)
+			isOnScreen = false;
 	}
 	@Override
 	public BufferedImage getImage() {
-		return bombImages[currentX][currentY];
+		if(!isExploding)
+			return bombImages[currentX][currentY];
+		else if(explosionItr < 15){
+			return explosionImages[explosionItr++];
+		}
+		return null;
 	}
 	@Override
 	public int getStrength() {
 		return strength;
 	}
-	
+	public int getHealth() {
+		return health;
+	}
 	public int getScore() {
 		return score;
 	}
@@ -104,5 +121,9 @@ public class SpaceBomb implements SpaceObject {
 	public void fire() {
 		VillainMissile2 v = new VillainMissile2(x + (int)(0.5 * width), y + (int)(0.5 * height));
 		swp.addVillainMissile2(v);
+	}
+	public void explode() {
+		strength = 0;
+		isExploding = true;
 	}
 }

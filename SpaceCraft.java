@@ -7,17 +7,18 @@ public class SpaceCraft implements SpaceObject {
 	private static int SPEED = 7;
 	
 	private SpaceWarriorPanel swp;
-	private BufferedImage craft, shieldImage[];
+	private BufferedImage craft, shieldImage[], explosionImages[];
 	
 	private int x, y, width, height;
 	private int dx, dy;
 	private int health, strength;
 	private int shieldTimer;
 	private int currentShieldImage;
+	private int explosionItr;
 	
 	private long chargeStart;
 	
-	private boolean isOnScreen, isCharging;
+	private boolean isOnScreen, isCharging, isExploding;
 	
 	public SpaceCraft(SpaceWarriorPanel swp) {
 		this.swp = swp;
@@ -31,13 +32,24 @@ public class SpaceCraft implements SpaceObject {
 		shieldImage = new BufferedImage[2];
 		shieldImage[0] = SpriteSheets.image1.getSubimage(158, 63, 37, 34);
 		shieldImage[1] = SpriteSheets.image1.getSubimage(204, 63, 37, 34);
+		
+		explosionImages = new BufferedImage[16];
+		int in = 0;
+		for(int i = 0; i < 16; i++) {
+			explosionImages[i] = SpriteSheets.explosion[in].getSubimage(64 * (i % 4), 64 * (i / 4), 64, 64);
+		}
 		x = SpaceWarrior.WIDTH / 2 - width / 2;
 		y = 3 * SpaceWarrior.HEIGHT / 4;
 	}
 	
 	@Override
 	public BufferedImage getImage() {
-		return craft;
+		if(!isExploding)
+			return craft;
+		else if(explosionItr < 15){
+			return explosionImages[explosionItr++];
+		}
+		return null;
 	}
 	
 	@Override
@@ -63,6 +75,10 @@ public class SpaceCraft implements SpaceObject {
             x = x + dx;
         if(y + dy >= 0 && y + dy <= SpaceWarrior.HEIGHT - width)
             y = y + dy;
+        
+        if(explosionItr == 15) {
+        	isOnScreen = false;
+        }
     }
 	
 	public void activateShield() {
@@ -84,7 +100,7 @@ public class SpaceCraft implements SpaceObject {
 		 health -= h;
 		 if(health <= 0) {
 			health = 0;
-			isOnScreen = false;
+			explode();
 		 }
 		 if(health>10)
 			 health = 10;
@@ -126,6 +142,12 @@ public class SpaceCraft implements SpaceObject {
 		}
 		charge = 0;
 	}
+	
+	public void explode() {
+		strength = 0;
+		isExploding = true;
+	}
+	
 	public void keyPressed(KeyEvent e) {
 		int key=e.getKeyCode();
         if(key==KeyEvent.VK_UP)

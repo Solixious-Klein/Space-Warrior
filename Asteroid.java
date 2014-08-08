@@ -12,12 +12,13 @@ public class Asteroid implements SpaceObject {
 	private int type;
 	private int strength, health;
 	private int score;
-	private int updateCounter;
+	private int updateCounter, explosionItr;
 	
 	private BufferedImage[] asteroids = new BufferedImage[8];
+	private BufferedImage explosionImages[];
 
 	private int currentImage;
-	private boolean isOnScreen;
+	private boolean isOnScreen, isExploding;
 	
 	public Asteroid() {
 		type = (int)(Math.random()*12+1);
@@ -46,6 +47,7 @@ public class Asteroid implements SpaceObject {
 			}
 			strength = 2;
 			health = 2;
+			explosionItr = 15;
 		}
 		else if(type >= 5 && type <= 7) {
 			if(type == 5) {
@@ -65,6 +67,7 @@ public class Asteroid implements SpaceObject {
 			}
 			strength = 3;
 			health = 3;
+			explosionItr = 3;
 		}
 		else if(type >= 8 && type <= 10) {
 			if(type == 8) {
@@ -82,6 +85,7 @@ public class Asteroid implements SpaceObject {
 				width = 50;
 				height = 56;
 			}
+			explosionItr = 0;
 			strength = 5;
 			health = 5;
 		}
@@ -96,6 +100,7 @@ public class Asteroid implements SpaceObject {
 				width = 33;
 				height = 31;
 			}
+			explosionItr = 7;
 			strength = 4;
 			health = 4;
 		}
@@ -104,6 +109,12 @@ public class Asteroid implements SpaceObject {
 		speed = (int)(Math.random() * MAX_SPEED + 1);
 		score = speed * strength;
 		speedOfRotation = (int)(Math.random() * 3);
+		
+		explosionImages = new BufferedImage[16];
+		int in = 2;
+		for(int i = 0; i < 16; i++) {
+			explosionImages[i] = SpriteSheets.explosion[in].getSubimage(64 * (i % 4), 64 * (i / 4), 64, 64);
+		}
 	}
 	
 	@Override
@@ -124,7 +135,11 @@ public class Asteroid implements SpaceObject {
 	}
 	@Override
 	public BufferedImage getImage() {
-		return asteroids[currentImage];
+		if(!isExploding)
+			return asteroids[currentImage];
+		else if(explosionItr < 15)
+			return explosionImages[explosionItr++];
+		return null;
 	}
 	@Override
 	public void move() {
@@ -140,6 +155,8 @@ public class Asteroid implements SpaceObject {
 				y += (height * 0.2);
 			currentImage = (currentImage+1) % 8;
 		}
+		if(explosionItr == 15)
+			isOnScreen = false;
 	}
 	
 	public int getType() {
@@ -158,9 +175,12 @@ public class Asteroid implements SpaceObject {
 		health -= h;
 		if(health <= 0) {
 			health = 0;
-			strength = 0;
-			isOnScreen = false;
+			explode();
+			//isOnScreen = false;
 		}
+	}
+	public int getHealth() {
+		return health;
 	}
 	public int getScore() {
 		return score;
@@ -172,5 +192,9 @@ public class Asteroid implements SpaceObject {
 			bi[i] = SpriteSheets.image2.getSubimage(x + i*width, y, width, height);
 		}
 		return bi;
+	}
+	public void explode() {
+		strength = 0;
+		isExploding = true;
 	}
 }
