@@ -47,7 +47,7 @@ public class Asteroid implements SpaceObject {
 			}
 			strength = 2;
 			health = 2;
-			explosionItr = 15;
+			//explosionItr = 15;
 		}
 		else if(type >= 5 && type <= 7) {
 			if(type == 5) {
@@ -67,7 +67,7 @@ public class Asteroid implements SpaceObject {
 			}
 			strength = 3;
 			health = 3;
-			explosionItr = 3;
+			//explosionItr = 3;
 		}
 		else if(type >= 8 && type <= 10) {
 			if(type == 8) {
@@ -85,7 +85,7 @@ public class Asteroid implements SpaceObject {
 				width = 50;
 				height = 56;
 			}
-			explosionItr = 0;
+			//explosionItr = 0;
 			strength = 5;
 			health = 5;
 		}
@@ -100,7 +100,7 @@ public class Asteroid implements SpaceObject {
 				width = 33;
 				height = 31;
 			}
-			explosionItr = 7;
+			//explosionItr = 7;
 			strength = 4;
 			health = 4;
 		}

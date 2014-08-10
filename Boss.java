@@ -6,16 +6,18 @@ public class Boss implements SpaceObject{
 	public static int BATTLING = 2;
 	
 	private BufferedImage bossImages[];
+	private BufferedImage explosionImages[];
 	private int currentImage;
 	private int phase;
 	
 	private int health, strength;
 	private int x, y;
 	private int speed;
+	private int explosionItr;
 	
 	private int itr, itr2;
 	
-	private boolean isOnScreen;
+	private boolean isOnScreen, isExploding;
 	
 	private SpaceWarriorPanel swp;
 	
@@ -35,11 +37,17 @@ public class Boss implements SpaceObject{
 		currentImage = 0;
 		phase = ENTERING;
 		
-		health = 100;
+		health = 5;
 		y = 1 - bossImages[currentImage].getHeight();
 		x = (SpaceWarrior.WIDTH / 2) - (bossImages[currentImage].getWidth() / 2);
 		strength = 999;
 		speed = 2;
+		
+		explosionImages = new BufferedImage[16];
+		int in = 2;
+		for(int i = 0; i < 16; i++) {
+			explosionImages[i] = SpriteSheets.explosion[in].getSubimage(64 * (i % 4), 64 * (i / 4), 64, 64);
+		}
 	}
 	public int getPhase() {
 		return phase;
@@ -93,17 +101,25 @@ public class Boss implements SpaceObject{
 		else if(x + getWidth() < scX) {
 			x += speed;
 		}
+		
+		if(explosionItr == 15)
+			isOnScreen = false;
 	}
 	@Override
 	public void damaged(int v) {
 		health -= v;
 		if(health <= 0) {
-			isOnScreen = false;
+			explode();
 		}
 	}
 	@Override
 	public BufferedImage getImage() {
-		return bossImages[currentImage];
+		if(!isExploding)
+			return bossImages[currentImage];
+		else if(explosionItr <= 15) {
+			return explosionImages[explosionItr++];
+		}
+		return null;
 	}
 	public void enter() {
 		isOnScreen = true;
@@ -121,5 +137,9 @@ public class Boss implements SpaceObject{
 	public void fire2() {
 		VillainMissile4 vm5 = new VillainMissile4(x + (getWidth() / 2), y + (getHeight() / 2));
 		swp.addVillainMissile4(vm5);
+	}
+	public void explode() {
+		strength = 0;
+		isExploding = true;
 	}
 }

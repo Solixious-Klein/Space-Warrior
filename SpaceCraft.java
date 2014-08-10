@@ -14,7 +14,7 @@ public class SpaceCraft implements SpaceObject {
 	private int health, strength;
 	private int shieldTimer;
 	private int currentShieldImage;
-	private int explosionItr;
+	private int explosionItr, explosionItr2;
 	
 	private long chargeStart;
 	
@@ -40,6 +40,7 @@ public class SpaceCraft implements SpaceObject {
 		}
 		x = SpaceWarrior.WIDTH / 2 - width / 2;
 		y = 3 * SpaceWarrior.HEIGHT / 4;
+		
 	}
 	
 	@Override
@@ -47,7 +48,10 @@ public class SpaceCraft implements SpaceObject {
 		if(!isExploding)
 			return craft;
 		else if(explosionItr < 15){
-			return explosionImages[explosionItr++];
+			if(explosionItr2 == 0)
+				explosionItr++;
+	        explosionItr2 = (explosionItr2 + 1) % 3;
+			return explosionImages[explosionItr];
 		}
 		return null;
 	}
@@ -99,8 +103,8 @@ public class SpaceCraft implements SpaceObject {
 	public void damaged(int h) {
 		 health -= h;
 		 if(health <= 0) {
-			health = 0;
-			explode();
+			 health = 0;
+			 explode();
 		 }
 		 if(health>10)
 			 health = 10;

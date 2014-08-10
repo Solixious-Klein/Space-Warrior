@@ -96,6 +96,7 @@ public class Villain implements SpaceObject{
 	public void damaged(int d) {
 		health -= d;
 		if(health <= 0) {
+			health = 0;
 			explode();
 		}
 	}
