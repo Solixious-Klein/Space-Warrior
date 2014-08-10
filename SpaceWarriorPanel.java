@@ -336,7 +336,7 @@ public class SpaceWarriorPanel extends JPanel {
 		synchronized(villains) {
 			for(int i = 0; i < villains.size(); i++) {
 				Villain v = villains.get(i);
-				g2d.drawImage(v.getImage(), v.getX(), v.getY(), this);
+				g2d.drawImage(v.getImage(), v.getX(), v.getY(), v.getWidth(), v.getHeight(), this);
 			}
 		}
 	}
@@ -344,7 +344,7 @@ public class SpaceWarriorPanel extends JPanel {
 		synchronized(spaceBombs) {
 			for(int i = 0; i < spaceBombs.size(); i++) {
 				SpaceBomb sb = spaceBombs.get(i);
-				g2d.drawImage(sb.getImage(), sb.getX(), sb.getY(), this);
+				g2d.drawImage(sb.getImage(), sb.getX(), sb.getY(), sb.getWidth(), sb.getHeight(), this);
 			}
 		}
 	}
