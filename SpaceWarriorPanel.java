@@ -29,7 +29,7 @@ public class SpaceWarriorPanel extends JPanel {
 	private static final int STARS_RATE_LIMITER = 100;
 	private static final int HEALTHPACKS_RATE_LIMITER = 1000;
 	private static final int VILLAIN_RATE_LIMITER = 400;
-	private static final int SHIELDS_RATE_LIMITER = 2500;
+	private static final int SHIELDS_RATE_LIMITER = 2000;
 	private static final int SPACE_BOMB_RATE_LIMITER = 300;
 	
 	private static int RATE_OF_ASTEROIDS = 60; //rate of asteroids fall
@@ -106,9 +106,9 @@ public class SpaceWarriorPanel extends JPanel {
 		
 		RATE_OF_ASTEROIDS = 60;
 		RATE_OF_STARS = 50;
-		RATE_OF_HEALTHPACKS = 100;
+		RATE_OF_HEALTHPACKS = 50;
 		RATE_OF_VILLAINS = 300;
-		RATE_OF_SHIELDS = 10;
+		RATE_OF_SHIELDS = 20;
 		RATE_OF_SPACE_BOMBS = 50;
 		
 		score = 0;
@@ -467,31 +467,31 @@ public class SpaceWarriorPanel extends JPanel {
 				if(actualScore > 100) {
 					RATE_OF_ASTEROIDS = 80;
 				}
-				if(actualScore > 250) {
+				if(actualScore > 500) {
 					setVillainsEnabled(true);
 				}
-				if(actualScore > 500) {
+				if(actualScore > 1000) {
 					setSpaceBombsEnabled(true);
 				}
-				if(actualScore > 1000) {
+				if(actualScore > 1500) {
 					RATE_OF_ASTEROIDS = 90;
 				}
-				if(actualScore > 1500) {
+				if(actualScore > 2500) {
 					RATE_OF_VILLAINS = 340;
 				}
-				if(actualScore > 2000) {
+				if(actualScore > 3000) {
 					RATE_OF_SPACE_BOMBS = 100;
 				}
-				if(actualScore > 2500) {
+				if(actualScore > 3500) {
 					RATE_OF_SPACE_BOMBS = 150;
 				}
-				if(actualScore > 3000) {
+				if(actualScore > 4000) {
 					RATE_OF_SPACE_BOMBS = 200;
 				}
-				if(actualScore > 3500) {
+				if(actualScore > 4500) {
 					RATE_OF_SPACE_BOMBS = 250;
 				}
-				if(actualScore > 4000 && !boss.isOnScreen() && boss.getHealth() > 0) {
+				if(actualScore > 5000 && !boss.isOnScreen() && boss.getHealth() > 0) {
 					boss.enter();
 					setAsteroidsEnabled(false);
 					setSpaceBombsEnabled(false);
