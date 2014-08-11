@@ -58,7 +58,7 @@ public class SpaceWarriorPanel extends JPanel {
 	private Thread at;	//animation thread
 	private Thread ut; //updation thread
 	
-	private boolean isAnimating, isPaused, battleWon;	//animation stops if this is false
+	private boolean isAnimating, isPaused, finalBattle, battleWon;	//animation stops if this is false
 	private boolean asteroidsPresence, villainsPresence, spaceBombsPresence, shieldsPresence, healthPacksPresence;
 	
 	private int starItr, asteroidItr, healthPackItr, villainItr, shieldItr, spaceBombItr;	//iterators for appearance of various occasional objects like stars, asteroids and healthpacks on screen
@@ -138,6 +138,7 @@ public class SpaceWarriorPanel extends JPanel {
 		spaceBombsPresence = false;
 		shieldsPresence = false;
 		healthPacksPresence = false;
+		finalBattle = false;
 		
 		initialTime = System.currentTimeMillis();
 		
@@ -459,36 +460,36 @@ public class SpaceWarriorPanel extends JPanel {
 					updateHighScore();
 				}
 				
-				if(actualScore > 3) {
+				if(actualScore > 3 && !finalBattle) {
 					setAsteroidsEnabled(true);
 					setHealthPacksEnabled(true);
 					setShieldsEnabled(true);
 				}
-				if(actualScore > 100) {
+				if(actualScore > 100 && !finalBattle) {
 					RATE_OF_ASTEROIDS = 80;
 				}
-				if(actualScore > 500) {
+				if(actualScore > 500 && !finalBattle) {
 					setVillainsEnabled(true);
 				}
-				if(actualScore > 1000) {
+				if(actualScore > 1000 && !finalBattle) {
 					setSpaceBombsEnabled(true);
 				}
-				if(actualScore > 1500) {
+				if(actualScore > 1500 && !finalBattle) {
 					RATE_OF_ASTEROIDS = 90;
 				}
-				if(actualScore > 2500) {
+				if(actualScore > 2500 && !finalBattle) {
 					RATE_OF_VILLAINS = 340;
 				}
-				if(actualScore > 3000) {
+				if(actualScore > 3000 && !finalBattle) {
 					RATE_OF_SPACE_BOMBS = 100;
 				}
-				if(actualScore > 3500) {
+				if(actualScore > 3500 && !finalBattle) {
 					RATE_OF_SPACE_BOMBS = 150;
 				}
-				if(actualScore > 4000) {
+				if(actualScore > 4000 && !finalBattle) {
 					RATE_OF_SPACE_BOMBS = 200;
 				}
-				if(actualScore > 4500) {
+				if(actualScore > 4500 && !finalBattle) {
 					RATE_OF_SPACE_BOMBS = 250;
 				}
 				if(actualScore > 5000 && !boss.isOnScreen() && boss.getHealth() > 0) {
@@ -496,7 +497,9 @@ public class SpaceWarriorPanel extends JPanel {
 					setAsteroidsEnabled(false);
 					setSpaceBombsEnabled(false);
 					setVillainsEnabled(false);
-					
+					setHealthPacksEnabled(false);
+					setShieldsEnabled(false);
+					finalBattle = true;
 				}
 				
 				updateCraft();
