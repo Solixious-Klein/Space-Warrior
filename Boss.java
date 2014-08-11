@@ -37,7 +37,7 @@ public class Boss implements SpaceObject{
 		currentImage = 0;
 		phase = ENTERING;
 		
-		health = 5;
+		health = 100;
 		y = 1 - bossImages[currentImage].getHeight();
 		x = (SpaceWarrior.WIDTH / 2) - (bossImages[currentImage].getWidth() / 2);
 		strength = 999;
